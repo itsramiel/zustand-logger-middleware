@@ -12,21 +12,22 @@ type LoggerImpl = <T>(
 
 const loggerImpl: LoggerImpl = (config) => (set, get, api) => {
   const result = config(set, get, api);
-  if (typeof result === "object" && result !== null && result !== undefined) {
-    return Object.entries(result).reduce((acc, [key, value]) => {
-      if (typeof value === "function") {
-        acc[key] = () => {
-          value();
-          console.log(`${key} called`);
-        };
-      } else {
-        acc[key] = value;
-      }
-      return acc;
-    }, {}) as any;
-  } else {
-    return result;
+  if (typeof result === "object" && result !== null) {
+    return Object.fromEntries(
+      Object.entries(result).map(([key, value]) => {
+        let enhancedValue = value;
+        if (typeof value === "function") {
+          enhancedValue = (...args: Parameters<typeof value>) => {
+            const ret = value(...args);
+            console.log(`${key} called`);
+            return ret;
+          };
+        }
+        return [key, enhancedValue];
+      })
+    ) as typeof result;
   }
+  return result;
 };
 
 const store = create<State>()(
