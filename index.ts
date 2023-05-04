@@ -7,10 +7,11 @@ type State = {
 };
 
 type LoggerImpl = <T>(
-  storeInitializer: StateCreator<T, [], []>
+  storeInitializer: StateCreator<T, [], []>,
+  logger: (actionName: string, args: unknown) => void
 ) => StateCreator<T, [], []>;
 
-const loggerImpl: LoggerImpl = (config) => (set, get, api) => {
+const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
   const result = config(set, get, api);
   if (typeof result === "object" && result !== null) {
     return Object.fromEntries(
@@ -19,7 +20,7 @@ const loggerImpl: LoggerImpl = (config) => (set, get, api) => {
         if (typeof value === "function") {
           enhancedValue = (...args: Parameters<typeof value>) => {
             const ret = value(...args);
-            console.log(`${key} called`);
+            logger(key, args);
             return ret;
           };
         }
@@ -31,11 +32,16 @@ const loggerImpl: LoggerImpl = (config) => (set, get, api) => {
 };
 
 const store = create<State>()(
-  loggerImpl((set) => ({
-    count: 0,
-    increment: () => set((state: State) => ({ count: state.count + 1 })),
-    decrement: () => set((state: State) => ({ count: state.count - 1 })),
-  }))
+  loggerImpl(
+    (set) => ({
+      count: 0,
+      increment: () => set((state: State) => ({ count: state.count + 1 })),
+      decrement: () => set((state: State) => ({ count: state.count - 1 })),
+    }),
+    (actionName, args) => {
+      console.log(`${actionName} called with: ${args}`);
+    }
+  )
 );
 store.getState().increment();
 console.log(store.getState());
