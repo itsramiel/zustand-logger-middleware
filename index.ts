@@ -2,8 +2,10 @@ import { StateCreator, create } from "zustand";
 
 type State = {
   count: number;
-  increment: () => void;
-  decrement: () => void;
+  actions: {
+    increment: () => void;
+    decrement: () => void;
+  };
 };
 
 type LoggerImpl = <T>(
@@ -14,19 +16,23 @@ type LoggerImpl = <T>(
 const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
   const result = config(set, get, api);
   if (typeof result === "object" && result !== null) {
-    return Object.fromEntries(
-      Object.entries(result).map(([key, value]) => {
-        let enhancedValue = value;
-        if (typeof value === "function") {
-          enhancedValue = (...args: Parameters<typeof value>) => {
-            const ret = value(...args);
-            logger(key, args);
-            return ret;
-          };
-        }
-        return [key, enhancedValue];
-      })
-    ) as typeof result;
+    let actions = result["actions"];
+    if (actions && typeof actions === "object" && actions !== null) {
+      actions = Object.fromEntries(
+        Object.entries(actions).map(([actionName, actionFn]) => {
+          let enhancedFn = actionFn;
+          if (typeof actionFn === "function") {
+            enhancedFn = (...args: unknown[]) => {
+              const ret = actionFn(...args);
+              logger(actionName, args);
+              return ret;
+            };
+          }
+          return [actionName, enhancedFn];
+        })
+      );
+      result["actions"] = actions;
+    }
   }
   return result;
 };
@@ -35,13 +41,15 @@ const store = create<State>()(
   loggerImpl(
     (set) => ({
       count: 0,
-      increment: () => set((state: State) => ({ count: state.count + 1 })),
-      decrement: () => set((state: State) => ({ count: state.count - 1 })),
+      actions: {
+        increment: () => set((state: State) => ({ count: state.count + 1 })),
+        decrement: () => set((state: State) => ({ count: state.count - 1 })),
+      },
     }),
     (actionName, args) => {
       console.log(`${actionName} called with: ${args}`);
     }
   )
 );
-store.getState().increment();
+store.getState().actions.increment();
 console.log(store.getState());
