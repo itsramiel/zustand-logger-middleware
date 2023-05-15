@@ -1,5 +1,3 @@
-#zustand-logger-middleware
-
 ## Middleware for zustand to log the name of the function called as well as its arguments
 
 ### Installation:
