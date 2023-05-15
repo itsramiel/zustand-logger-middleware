@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import loggerImpl from ".";
+import logger from ".";
 
 const mockLoggerFn = jest.fn();
 mockLoggerFn.mockName("mockLoggerFn ");
@@ -13,7 +13,7 @@ type State = {
 };
 
 const store = create<State>()(
-  loggerImpl(
+  logger(
     (set) => ({
       count: 0,
       actions: {

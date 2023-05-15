@@ -5,7 +5,7 @@ type LoggerImpl = <T>(
   logger: (actionName: string, args: unknown[]) => void
 ) => StateCreator<T, [], []>;
 
-const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
+const logger: LoggerImpl = (config, logger) => (set, get, api) => {
   const result = config(set, get, api);
   if (typeof result === "object" && result !== null) {
     let actions = result["actions"];
@@ -29,4 +29,4 @@ const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
   return result;
 };
 
-export default loggerImpl;
+export default logger;
