@@ -1,16 +1,8 @@
-import { StateCreator, create } from "zustand";
-
-type State = {
-  count: number;
-  actions: {
-    increment: () => void;
-    decrement: () => void;
-  };
-};
+import { StateCreator } from "zustand";
 
 type LoggerImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
-  logger: (actionName: string, args: unknown) => void
+  logger: (actionName: string, args: unknown[]) => void
 ) => StateCreator<T, [], []>;
 
 const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
@@ -37,19 +29,4 @@ const loggerImpl: LoggerImpl = (config, logger) => (set, get, api) => {
   return result;
 };
 
-const store = create<State>()(
-  loggerImpl(
-    (set) => ({
-      count: 0,
-      actions: {
-        increment: () => set((state: State) => ({ count: state.count + 1 })),
-        decrement: () => set((state: State) => ({ count: state.count - 1 })),
-      },
-    }),
-    (actionName, args) => {
-      console.log(`${actionName} called with: ${args}`);
-    }
-  )
-);
-store.getState().actions.increment();
-console.log(store.getState());
+export default loggerImpl;
