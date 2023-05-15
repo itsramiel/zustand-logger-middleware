@@ -1,6 +1,6 @@
 {
   "name": "zustand-logger-middleware",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,14 +16,20 @@
     "build": "tsc",
     "test": "jest"
   },
-  "keywords": [],
+  "keywords": [
+    "zustand",
+    "zustand middleware",
+    "logger middleware",
+    "zustand log"
+  ],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "react": "^18.2.0",
-    "zustand": "^4.3.7"
+  "peerDependencies": {
+    "zustand": ">= 4.0.0"
   },
   "devDependencies": {
+    "react": "^18.2.0",
+    "zustand": "^4.3.7",
     "@types/jest": "^29.5.1",
     "jest": "^29.5.0",
     "nodemon": "^2.0.22",
