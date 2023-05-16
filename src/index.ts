@@ -1,11 +1,22 @@
-import { StateCreator } from "zustand";
+import { StateCreator, StoreMutatorIdentifier } from "zustand";
 
-type LoggerImpl = <T>(
+type TLoggerFn = (actionName: string, args: unknown[]) => void;
+
+type TLogger = <
+  T extends object,
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = []
+>(
+  f: StateCreator<T, Mps, Mcs>,
+  logger?: TLoggerFn
+) => StateCreator<T, Mps, Mcs>;
+
+type TLoggerImpl = <T>(
   storeInitializer: StateCreator<T, [], []>,
-  logger: (actionName: string, args: unknown[]) => void
+  logger: TLoggerFn
 ) => StateCreator<T, [], []>;
 
-const logger: LoggerImpl = (config, logger) => (set, get, api) => {
+const logger: TLoggerImpl = (config, logger) => (set, get, api) => {
   const result = config(set, get, api);
   if (typeof result === "object" && result !== null) {
     let actions = result["actions"];
@@ -29,4 +40,4 @@ const logger: LoggerImpl = (config, logger) => (set, get, api) => {
   return result;
 };
 
-export default logger;
+export default logger as unknown as TLogger;
