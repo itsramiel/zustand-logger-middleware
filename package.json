@@ -1,7 +1,10 @@
 {
   "name": "zustand-logger-middleware",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "",
+  "homepage": "https://github.com/itsramiel/zustand-logger-middleware",
+  "repository": "https://github.com/itsramiel/zustand-logger-middleware",
+  "bugs": "https://github.com/itsramiel/zustand-logger-middleware",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
