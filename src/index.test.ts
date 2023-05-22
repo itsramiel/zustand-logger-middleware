@@ -13,13 +13,16 @@ type State = {
 };
 
 const store = create<State>()(
-  logger((set) => ({
-    count: 0,
-    actions: {
-      increment: () => set((prev) => ({ count: prev.count + 1 })),
-      add: (value) => set((prev) => ({ count: prev.count + value })),
-    },
-  }))
+  logger(
+    (set) => ({
+      count: 0,
+      actions: {
+        increment: () => set((prev) => ({ count: prev.count + 1 })),
+        add: (value) => set((prev) => ({ count: prev.count + value })),
+      },
+    }),
+    mockLoggerFn
+  )
 );
 
 describe("loggerImpl", () => {

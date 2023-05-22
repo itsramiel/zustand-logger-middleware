@@ -17,27 +17,26 @@ type TLoggerImpl = <T>(
 ) => StateCreator<T, [], []>;
 
 const logger: TLoggerImpl = (config, logger) => (set, get, api) => {
-  const result = config(set, get, api);
-  if (typeof result === "object" && result !== null) {
-    let actions = result["actions"];
-    if (actions && typeof actions === "object" && actions !== null) {
-      actions = Object.fromEntries(
-        Object.entries(actions).map(([actionName, actionFn]) => {
-          let enhancedFn = actionFn;
-          if (typeof actionFn === "function") {
-            enhancedFn = (...args: unknown[]) => {
-              const ret = actionFn(...args);
-              logger(actionName, args);
-              return ret;
-            };
-          }
-          return [actionName, enhancedFn];
-        })
-      );
-      result["actions"] = actions;
-    }
+  const originalConfig = config(set, get, api);
+  let actions = originalConfig["actions"];
+  if (actions && typeof actions === "object") {
+    const newActions = Object.fromEntries(
+      Object.entries(actions).map(([actionName, actionFn]) => {
+        let enhancedFn = actionFn;
+        if (typeof actionFn === "function") {
+          enhancedFn = (...args: unknown[]) => {
+            const ret = actionFn(...args);
+            logger(actionName, args);
+            return ret;
+          };
+        }
+        return [actionName, enhancedFn];
+      })
+    );
+    // Spread originalConfig and overwrite the actions property
+    return { ...originalConfig, actions: newActions };
   }
-  return result;
+  return originalConfig;
 };
 
 export default logger as unknown as TLogger;
